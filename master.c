@@ -51,7 +51,6 @@ sprintf(pid_wd_a, "%d", pid_wd);
 
 char * arg_list_3[] = { "/usr/bin/konsole",  "-e", "./command", pid_wd_a , (char*)NULL };
 pid_command = spawn("/usr/bin/konsole", arg_list_3);
-sprintf(pid_command_a, "%d", pid_command);
 
 char * arg_list_4[] = { "/usr/bin/konsole",  "-e", "./inspection", pid_motor_x_a, pid_motor_z_a, (char*)NULL };
 pid_inspection = spawn("/usr/bin/konsole", arg_list_4);
@@ -61,6 +60,7 @@ create_fifo("fifo_command_to_mot_x");
 create_fifo("fifo_command_to_mot_z");
 create_fifo("fifo_est_pos_x");
 create_fifo("fifo_est_pos_z");
+create_fifo("fifo_command_to_ins");
 
 wait(NULL);
 
@@ -69,6 +69,7 @@ unlink("fifo_command_to_mot_x");
 unlink("fifo_command_to_mot_z");
 unlink("fifo_est_pos_x");
 unlink("fifo_est_pos_z");
+unlink("fifo_command_to_ins");
 return 0;
 
 }

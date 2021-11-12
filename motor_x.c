@@ -28,6 +28,7 @@ void sighandler(int sig){
 	if(sig==SIGUSR2){
 
 		reset = true;
+
 	}
 }
 
@@ -35,7 +36,6 @@ int main(int argc, char * argv[]){
 
 	int fd_c_to_mx, fd_mx_to_ins;
 	int ret;
-	int print=50;
 
 	struct timeval tv={0,0};
 
@@ -79,16 +79,19 @@ int main(int argc, char * argv[]){
 
 			case true: //reset running
 
-				while(position>=0){
+				while(position>0.001){
 
 					position -= step;
 					usleep(10000);
-					if (position>6.0) position=6.0;
-					if (position<0.0) position=0.0;
 					write(fd_mx_to_ins, &position, sizeof(float));		
 				}
+				if (position<=0.001){
 
-				reset = false;
+					position=0.0;
+					value = 3;
+					printf("reset_finish\n");
+					reset = false;
+				} 
 
 			break;
 

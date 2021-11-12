@@ -14,7 +14,7 @@ pid_t pid_motor_z;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
-		alarm(10);
+		alarm(60);
 	}
 	if(sig==SIGALRM){  // per ora killa dopo 60 sec 
 		kill(pid_motor_x, SIGKILL);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	sa.sa_handler=&sighandler;
 	sa.sa_flags=SA_RESTART;
 
-	alarm(10);
+	alarm(60);
 	sigaction(SIGUSR1,&sa,NULL);
 	sigaction(SIGALRM,&sa,NULL);
 

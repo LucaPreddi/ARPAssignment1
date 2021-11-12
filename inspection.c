@@ -12,9 +12,11 @@
 #define BHGRN "\e[1;92m"
 #define RESET "\033[0m"
 
+pid_t pid_command;
+
 int main(int argc, char * argv[]){
 
-	int fd_mx_to_ins , fd_mz_to_ins;
+	int fd_mx_to_ins , fd_mz_to_ins, fd_command_to_ins;
 	int ret;
 	int pid_motor_x, pid_motor_z;
 	char c_1;
@@ -31,17 +33,17 @@ int main(int argc, char * argv[]){
     newt.c_lflag &= ~(ICANON);          
     tcsetattr( STDIN_FILENO, TCSANOW, &newt);
 
+    fd_command_to_ins = open("fifo_command_to_ins", O_RDONLY);
+
 	fd_mx_to_ins = open("fifo_est_pos_x",O_RDONLY);
-	if (fd_mx_to_ins == -1){
+
+	fd_mz_to_ins = open("fifo_est_pos_z",O_RDONLY);
+
+	if (fd_mx_to_ins == -1 || fd_mz_to_ins == -1 || fd_command_to_ins == -1){
 		printf("Error opening mx to inspection fifo!");
 		return 5;
 	}
 
-	fd_mz_to_ins = open("fifo_est_pos_z",O_RDONLY);
-	if (fd_mz_to_ins == -1){
-		printf("Error opening mx to inspection fifo!");
-		return 5;
-	}
 
 	pid_motor_x = atoi(argv[1]);
 	pid_motor_z = atoi(argv[2]);
@@ -49,6 +51,8 @@ int main(int argc, char * argv[]){
 	printf("\n" BHGRN"  #############" RESET "\n");
 	printf(BHGRN "  # INSPECTOR #" RESET "\n");
 	printf(BHGRN"  #############" RESET "\n\n");
+
+	read(fd_command_to_ins,&pid_command, sizeof(int));
 
 	while(1){
 
@@ -73,7 +77,9 @@ int main(int argc, char * argv[]){
 			}
 
 			if (FD_ISSET(0,&rset)>0){
+
 				read(0, &c_1, sizeof(char));
+
 				if(c_1=='s'){
 					kill(pid_motor_x, SIGUSR1);
 					kill(pid_motor_z, SIGUSR1);
@@ -81,9 +87,15 @@ int main(int argc, char * argv[]){
 				if(c_1=='r'){
 					kill(pid_motor_x,SIGUSR2);
 					kill(pid_motor_z,SIGUSR2);
+					kill(pid_command,SIGUSR2);
 				}
 			}
 		}
+
+		if(position_x==0.0 && position_z==0.0){
+			kill(pid_command, SIGUSR1);
+		}
+
 		printf("\r  La posizione lungo x è: %f m, La posizione lungo z è: %f m", position_x, position_z);
 		fflush(stdout);
 	}

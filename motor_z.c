@@ -78,16 +78,18 @@ int main(int argc, char * argv[]){
 
 			case true: //reset running
 
-				while(position>=0){
+				while(position>0.001){
 
 					position -= step;
 					usleep(10000);
-					if (position>6.0) position=6.0;
-					if (position<0.0) position=0.0;
 					write(fd_mz_to_ins, &position, sizeof(float));		
 				}
 
-				reset = false;
+				if (position<=0.001){
+					position=0.0;
+					value = 3;
+					reset = false;
+				}
 
 			break;
 
