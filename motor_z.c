@@ -9,9 +9,17 @@
 #include <string.h>
 #include <sys/wait.h>
 
+typedef enum {
+	false,
+	true
+}bool;
+
+bool reset = false;
+
 int value;
 
 float position=0.0;
+float step=0.001;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
@@ -19,8 +27,7 @@ void sighandler(int sig){
 	}
 	if(sig==SIGUSR2){
 
-		position=0.0;
-		value=6;
+		reset = true;
 	}
 }
 
@@ -28,8 +35,6 @@ int main(int argc, char * argv[]){
 
 	int fd_c_to_mz, fd_mz_to_ins;
 	int ret;
-	int print=50;
-	float step=0.001;
 
 	struct timeval tv={0,0};
 
@@ -69,34 +74,61 @@ int main(int argc, char * argv[]){
 			}
 		}
 
-		switch(value){
+		switch(reset){
 
-			case 4:
-				if (position>=6.0){
+			case true: //reset running
+
+				while(position>=0){
+
+					position -= step;
+					usleep(10000);
+					if (position>6.0) position=6.0;
+					if (position<0.0) position=0.0;
+					write(fd_mz_to_ins, &position, sizeof(float));		
 				}
-				else{
-					position+=step;
-				}
-				usleep(10000);
+
+				reset = false;
 
 			break;
 
-			case 5:
-				if (position<=0.0){
-				}
-				else {
-					position-=step;
-				}
-				usleep(10000);
-			break;
 
-			case 6:
-				usleep(10000);
+			case false:
+
+				switch(value){
+
+					case 4:
+						if (position>=6.0){
+						}
+						else{
+							position+=step;
+						}
+						usleep(10000);
+
+					break;
+
+					case 5:
+
+						if (position<=0.0){
+						}
+						else {
+							position-=step;
+						}
+						usleep(10000);
+
+					break;
+
+					case 6:
+						usleep(10000);
+					break;
+				}
+
+			if (position>6.0) position=6.0;
+			if (position<0.0) position=0.0;
+			write(fd_mz_to_ins, &position, sizeof(float));		
+
 			break;
 		}
-		if (position>6.0) position=6.0;
-		if (position<0.0) position=0.0;
-		write(fd_mz_to_ins, &position, sizeof(float));									  
+							  
 	}
 	return 0;
 }

@@ -9,18 +9,25 @@
 #include <string.h>
 #include <sys/wait.h>
 
+typedef enum {
+	false,
+	true
+}bool;
+
+bool reset = false;
+
 int value;
 
 float position=0.0;
+float step=0.001;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
 		value=3;
 	}
 	if(sig==SIGUSR2){
-		
-		position=0.0;
-		value=3;
+
+		reset = true;
 	}
 }
 
@@ -29,7 +36,6 @@ int main(int argc, char * argv[]){
 	int fd_c_to_mx, fd_mx_to_ins;
 	int ret;
 	int print=50;
-	float step=0.001;
 
 	struct timeval tv={0,0};
 
@@ -69,35 +75,60 @@ int main(int argc, char * argv[]){
 			}
 		}
 
-		switch(value){
+		switch(reset){
 
-			case 1:
-				if (position>=6.0){
+			case true: //reset running
+
+				while(position>=0){
+
+					position -= step;
+					usleep(10000);
+					if (position>6.0) position=6.0;
+					if (position<0.0) position=0.0;
+					write(fd_mx_to_ins, &position, sizeof(float));		
 				}
-				else{
-					position+=step;
-				}
-				usleep(10000);
+
+				reset = false;
 
 			break;
 
-			case 2:
-				if (position<=0.0){
+			case false:
+		
+				switch(value){
+
+					case 1:
+						if (position>=6.0){
+						}
+						else{
+							position+=step;
+						}
+						usleep(10000);
+
+					break;
+
+					case 2:
+						if (position<=0.0){
+						}
+						else {
+							position-=step;
+						}
+						usleep(10000);
+					break;
+
+					case 3:
+						usleep(10000);
+
+					break;
 				}
-				else {
-					position-=step;
-				}
-				usleep(10000);
+
+			if (position>6.0) position=6.0;
+			if (position<0.0) position=0.0;
+			write(fd_mx_to_ins, &position, sizeof(float));	
+
 			break;
 
-			case 3:
-				usleep(10000);
-
-			break;
 		}
-		if (position>6.0) position=6.0;
-		if (position<0.0) position=0.0;
-		write(fd_mx_to_ins, &position, sizeof(float));												  
+											  
 	}
 	return 0;
 }

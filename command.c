@@ -20,7 +20,7 @@
 #define RESET "\033[0m"
 
 
-int main(void){   
+int main(int argc, char *argv[]){   
 
     int c_1 , c_2 , c_3;
     int fd_c_to_mx, fd_c_to_mz;
@@ -31,6 +31,10 @@ int main(void){
     int down = 5;
     int zstop = 6;
 
+    pid_t pid_wd;
+
+    pid_wd = atoi(argv[1]);
+
     static struct termios oldt, newt;
     tcgetattr( STDIN_FILENO, &oldt);
     newt = oldt;
@@ -38,6 +42,7 @@ int main(void){
     tcsetattr( STDIN_FILENO, TCSANOW, &newt);
     
     fd_c_to_mx=open("fifo_command_to_mot_x", O_WRONLY);
+    
     if (fd_c_to_mx==-1){
         printf("Error while trying to open the pipe");
     }
@@ -46,13 +51,13 @@ int main(void){
         printf("Error while trying to open the fifo");
     }
 
-    printf(BOLDRED "Welcome to you my friend, this is a simulator of a hoist robot!" RESET "\n");    
-    printf(BOLDYELLOW "Here there's a list of commands:" RESET "\n");
-    printf(BOLDGREEN "If you want to move, press right arrow!" RESET "\n");
-    printf(BOLDCYAN "If you want to move back, press left arrow!" RESET "\n");
-    printf(BOLDBLUE "If you want to move down, press up arrow!" RESET "\n");
-    printf(BOLDBLUE "If you want to move up, press down arrow!" RESET "\n");
-    printf("To stop the movement of the two axis, you can press X or Z!\n");
+    printf("\n" BOLDRED "  Welcome to you my friend, this is a simulator of a hoist robot!" RESET "\n");    
+    printf(BOLDYELLOW "  Here there's a list of commands:" RESET "\n");
+    printf(BOLDGREEN "  If you want to move, press right arrow!" RESET "\n");
+    printf(BOLDCYAN "  If you want to move back, press left arrow!" RESET "\n");
+    printf(BOLDBLUE "  If you want to move down, press up arrow!" RESET "\n");
+    printf(BOLDBLUE "  If you want to move up, press down arrow!" RESET "\n");
+    printf(BOLDWHITE"  To stop the movement of the two axis, you can press X or Z!" RESET "\n\n");
 
     while(1){
 
@@ -60,18 +65,20 @@ int main(void){
 
         switch(c_1){
 
-            case 115:
-                printf("ho letto : %c", c_1);
-            break;
+            case 120: // x pressed
 
-            case 120: //caso in cui premo x
-                printf("ho letto : %c", c_1);
+                printf("\n  ho letto : %c\n", c_1);
                 write(fd_c_to_mx, &xstop, sizeof(int));
+                kill(pid_wd, SIGUSR1);
+
             break;
 
-            case 122:
-                printf("ho letto : %c", c_1);
+            case 122: // z pressed 
+
+                printf("\n  ho letto: %c\n", c_1);
                 write(fd_c_to_mz, &zstop, sizeof(int));
+                kill(pid_wd, SIGUSR1);
+
             break;
 
             case 27:
@@ -82,23 +89,35 @@ int main(void){
                 switch(c_3){
 
                     case 65:
-                    	printf("\nFreccetta in alto\n");
+
+                    	printf("\n  Freccetta in alto\n");
                         write(fd_c_to_mz, &up, sizeof(int));
+                        kill(pid_wd, SIGUSR1);
+
                     break;
 
                     case 66:
-                    	printf("\nFreccetta in basso\n");
+
+                    	printf("\n  Freccetta in basso\n");
                         write(fd_c_to_mz, &down, sizeof(int));
+                        kill(pid_wd, SIGUSR1);
+
                     break;
 
                     case 67:
-                    	printf("\nFreccetta a destra\n");
+
+                    	printf("\n  Freccetta a destra\n");
                         write(fd_c_to_mx, &right, sizeof(int));
+                        kill(pid_wd, SIGUSR1);
+
                     break;
 
                     case 68:
-                    	printf("\nFreccetta_a_sinistra\n");
+
+                    	printf("\n  Freccetta_a_sinistra\n");
                         write(fd_c_to_mx, &left, sizeof(int));
+                        kill(pid_wd, SIGUSR1);
+                        
                     break;
                 }
             break; 
