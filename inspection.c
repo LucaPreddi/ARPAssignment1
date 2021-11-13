@@ -23,8 +23,7 @@ int main(int argc, char * argv[]){
 	int pid_motor_x, pid_motor_z;
 	char c_1;
 
-	float position_x , position_z;
-	float position_x_old, position_z_old;
+	int position_x , position_z;
 
 	struct timeval tv={0,0};
 
@@ -74,11 +73,11 @@ int main(int argc, char * argv[]){
 		else if(ret>0){
 
 			if (FD_ISSET(fd_mx_to_ins, &rset)>0){
-				read(fd_mx_to_ins, &position_x, sizeof(float));
+				read(fd_mx_to_ins, &position_x, sizeof(int));
 			}
 
 			if (FD_ISSET(fd_mz_to_ins, &rset)>0){
-				read(fd_mz_to_ins, &position_z, sizeof(float));
+				read(fd_mz_to_ins, &position_z, sizeof(int));
 			}
 
 			if (FD_ISSET(0,&rset)>0){
@@ -87,7 +86,7 @@ int main(int argc, char * argv[]){
 
 				if(c_1=='s'){
 
-					printf(BHRED "  EMERGENCY STOP" RESET "\n");
+					printf("\n"BHRED "  EMERGENCY STOP" RESET "\n");
 					fflush(stdout);
 					kill(pid_motor_x, SIGUSR1);
 					kill(pid_motor_z, SIGUSR1);
@@ -96,7 +95,7 @@ int main(int argc, char * argv[]){
 				}
 				if(c_1=='r'){
 
-					printf(BHYEL "  RESET" RESET "\n");
+					printf("\n"BHYEL "  RESET" RESET "\n");
 					fflush(stdout);
 					kill(pid_motor_x,SIGUSR2);
 					kill(pid_motor_z,SIGUSR2);
@@ -106,11 +105,11 @@ int main(int argc, char * argv[]){
 			}
 		}
 
-		if(position_x==0.0 && position_z==0.0){
+		if(position_x==0 && position_z==0){
 			kill(pid_command, SIGUSR1);
 		}
 
-		printf("\r  La posizione lungo x è: %f m, La posizione lungo z è: %f m", position_x, position_z);
+		printf("\r  La posizione lungo x è: %d m, La posizione lungo z è: %d m", position_x, position_z);
 		fflush(stdout);
   		fflush(out);
 	}

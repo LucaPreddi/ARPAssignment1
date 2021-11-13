@@ -1,0 +1,27 @@
+################# DEBUG FILE ################# 
+
+Pressed up arrow, z axis increasing.
+Pressed right arrow, x axis increasing.
+Pressed left arrow, z axis decreasing.
+Pressed right arrow, x axis increasing.
+Stop button pressed.
+Reset button pressed.
+Stop button pressed.
+Reset button pressed.
+Stop button pressed.
+Pressed left arrow, z axis decreasing.
+Pressed right arrow, x axis increasing.
+Pressed up arrow, z axis increasing.
+Pressed down arrow, z axis decreasing.
+Stop button pressed.
+Reset button pressed.
+Pressed up arrow, z axis increasing.
+Pressed left arrow, z axis decreasing.
+Pressed right arrow, x axis increasing.
+Pressed left arrow, z axis decreasing.
+Pressed right arrow, x axis increasing.
+Stop button pressed.
+Reset button pressed.
+Stop button pressed.
+Reset button pressed.
+Stop button pressed.

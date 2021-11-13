@@ -18,8 +18,8 @@ bool reset = false;
 
 int value;
 
-float position=0.0;
-float step=0.001;
+int position=0;
+int step=1;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
@@ -78,7 +78,7 @@ int main(int argc, char * argv[]){
 
 			case true: //reset running
 
-				if(position>0.001){
+				if(position>1){
 
 					if(value==6){
 						
@@ -89,11 +89,11 @@ int main(int argc, char * argv[]){
 
 					position -= step;
 					usleep(10000);
-					write(fd_mz_to_ins, &position, sizeof(float));		
+					write(fd_mz_to_ins, &position, sizeof(int));		
 				}
 
-				if (position<=0.001){
-					position=0.0;
+				if (position<=1){
+					position=0;
 					value = 6;
 					reset = false;
 				}
@@ -106,7 +106,7 @@ int main(int argc, char * argv[]){
 				switch(value){
 
 					case 4:
-						if (position>=6.0){
+						if (position>=6000){
 						}
 						else{
 							position+=step;
@@ -128,12 +128,13 @@ int main(int argc, char * argv[]){
 
 					case 6:
 						usleep(10000);
+						value = 0;
 					break;
 				}
 
-			if (position>6.0) position=6.0;
-			if (position<0.0) position=0.0;
-			write(fd_mz_to_ins, &position, sizeof(float));		
+			if (position>6000) position=6000;
+			if (position<0) position=0;
+			write(fd_mz_to_ins, &position, sizeof(int));		
 
 			break;
 		}
