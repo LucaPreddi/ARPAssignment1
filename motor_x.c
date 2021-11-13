@@ -90,6 +90,7 @@ int main(int argc, char * argv[]){
 					position=0.0;
 					value = 3;
 					printf("reset_finish\n");
+					fflush(stdout);
 					reset = false;
 				} 
 

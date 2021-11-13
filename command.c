@@ -30,6 +30,8 @@ void sighandler(int sig){
 
     if(sig==SIGUSR2){
         reset = true;
+        printf(BOLDRED " SYSTEM RESETTING" RESET "\n");
+        fflush(stdout);
     }
     if(sig==SIGUSR1){
         reset = false;
@@ -39,7 +41,7 @@ void sighandler(int sig){
 
 int main(int argc, char *argv[]){   
 
-    int c_1 , c_2 , c_3, c_reset;
+    int c_1 , c_2 , c_3;
     int fd_c_to_mx, fd_c_to_mz, fd_c_to_ins;
 
     int right=1;
@@ -92,27 +94,29 @@ int main(int argc, char *argv[]){
 
     while(1){
 
+        c_1=getchar();
+
         switch(reset){
 
-            case true:
+            case true: //reset
 
-                printf(BOLDRED " SYSTEM RESETTING" RESET "\n");
-
-                if(getchar()){
+                if(c_1 != 0){
                     printf(BOLDRED " SYSTEM RESETTING, WAIT UNTIL IT FINISHES!!!" RESET "\n");
+                    fflush(stdout);
                 }
+
+
 
             break;
 
             case false:
 
-                c_1=getchar();
-
                 switch(c_1){
 
                     case 120: // x pressed
 
-                        printf("\n  ho letto : %c\n", c_1);
+                        printf(BOLDRED "\n  STOP X  %c" RESET "\n", c_1);
+                        fflush(stdout);
 
                         write(fd_c_to_mx, &xstop, sizeof(int));
                         kill(pid_wd, SIGUSR1);
@@ -121,7 +125,9 @@ int main(int argc, char *argv[]){
 
                     case 122: // z pressed 
 
-                        printf("\n  ho letto: %c\n", c_1);
+                        printf(BOLDRED "\n  STOP Z  %c" RESET "\n", c_1);
+                        fflush(stdout);
+
                         write(fd_c_to_mz, &zstop, sizeof(int));
                         kill(pid_wd, SIGUSR1);
           
@@ -138,6 +144,7 @@ int main(int argc, char *argv[]){
                             case 65:
 
                             	printf("\n  Freccetta in alto\n");
+                                fflush(stdout);
                          
                                 write(fd_c_to_mz, &up, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
@@ -148,6 +155,7 @@ int main(int argc, char *argv[]){
                             case 66:
 
                             	printf("\n  Freccetta in basso\n");
+                                fflush(stdout);
                    
                                 write(fd_c_to_mz, &down, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
@@ -158,6 +166,8 @@ int main(int argc, char *argv[]){
                             case 67:
 
                             	printf("\n  Freccetta a destra\n");
+                                fflush(stdout);
+
                                 write(fd_c_to_mx, &right, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
                   
@@ -166,6 +176,8 @@ int main(int argc, char *argv[]){
                             case 68:
 
                             	printf("\n  Freccetta_a_sinistra\n");
+                                fflush(stdout);
+
                                 write(fd_c_to_mx, &left, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
                             
@@ -179,8 +191,9 @@ int main(int argc, char *argv[]){
                     default:
 
                         printf(BOLDRED " Command Not Allowed" RESET "\n");
+                        fflush(stdout);
 
-
+                        
                     break;
                 }
 

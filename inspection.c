@@ -10,7 +10,9 @@
 #include <string.h>
 
 #define BHGRN "\e[1;92m"
+#define BHRED "\e[1;91m"
 #define RESET "\033[0m"
+#define BHYEL "\e[1;93m"
 
 pid_t pid_command;
 
@@ -81,10 +83,16 @@ int main(int argc, char * argv[]){
 				read(0, &c_1, sizeof(char));
 
 				if(c_1=='s'){
+
+					printf(BHRED "  EMERGENCY STOP" RESET "\n");
+					fflush(stdout);
 					kill(pid_motor_x, SIGUSR1);
 					kill(pid_motor_z, SIGUSR1);
 				}
 				if(c_1=='r'){
+
+					printf(BHYEL "  RESET" RESET "\n");
+					fflush(stdout);
 					kill(pid_motor_x,SIGUSR2);
 					kill(pid_motor_z,SIGUSR2);
 					kill(pid_command,SIGUSR2);
