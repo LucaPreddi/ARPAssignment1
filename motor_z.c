@@ -85,7 +85,6 @@ int main(int argc, char * argv[]){
 						reset = false;
 						value = 0;
 					}
-		
 
 					position -= step;
 					usleep(10000);

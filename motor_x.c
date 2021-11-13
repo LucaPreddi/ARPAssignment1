@@ -18,7 +18,7 @@ bool reset = false;
 
 int value;
 
-int position=1;
+int position=0;
 int step=1;
 
 void sighandler(int sig){
@@ -66,7 +66,7 @@ int main(int argc, char * argv[]){
         ret=select(FD_SETSIZE, &rset, NULL, NULL, &tv);
 
 		if(ret==-1){
-			printf("There's an error opening the fifo.");
+			printf("There's an error on the ret");
 			fflush(stdout);
 		}
 		else if(ret>=0){
@@ -97,7 +97,6 @@ int main(int argc, char * argv[]){
 
 					position=0;
 					value = 3;
-					printf("reset_finish\n");
 					fflush(stdout);
 					reset = false;
 				} 
