@@ -30,7 +30,7 @@ void sighandler(int sig){
 
     if(sig==SIGUSR2){
         reset = true;
-        printf(BOLDRED " SYSTEM RESETTING" RESET "\n");
+        printf("\n" BOLDRED " SYSTEM RESETTING" RESET "\n");
         fflush(stdout);
     }
     if(sig==SIGUSR1){
@@ -41,8 +41,13 @@ void sighandler(int sig){
 
 int main(int argc, char *argv[]){   
 
+    FILE *out = fopen("debug.txt", "a");
+    if(out == NULL){
+        printf("ERRROR OPEN FILE");
+    }
+
     int c_1 , c_2 , c_3;
-    int fd_c_to_mx, fd_c_to_mz, fd_c_to_ins;
+    int fd_c_to_mx, fd_c_to_mz, fd_c_to_ins, fd_c_to_wd;
 
     int right=1;
     int left=2;
@@ -72,13 +77,15 @@ int main(int argc, char *argv[]){
     newt.c_lflag &= ~(ICANON);          
     tcsetattr( STDIN_FILENO, TCSANOW, &newt);
 
-    fd_c_to_ins=open("fifo_command_to_ins", O_WRONLY);
+    fd_c_to_ins=open(argv[2] ,O_WRONLY);
     
-    fd_c_to_mx=open("fifo_command_to_mot_x", O_WRONLY);
+    fd_c_to_mx=open(argv[3], O_WRONLY);
 
-    fd_c_to_mz=open("fifo_command_to_mot_z", O_WRONLY);
+    fd_c_to_mz=open(argv[4], O_WRONLY);
+
+    fd_c_to_wd=open(argv[5], O_WRONLY);
     
-    if (fd_c_to_mx==-1 || fd_c_to_mz == -1 || fd_c_to_ins==-1){
+    if (fd_c_to_mx==-1 || fd_c_to_mz == -1 || fd_c_to_ins==-1 || fd_c_to_wd==-1){
         printf("Error while trying to open pipes");
     }
 
@@ -92,6 +99,8 @@ int main(int argc, char *argv[]){
 
     write(fd_c_to_ins, &pid_command, sizeof(int));
 
+    write(fd_c_to_wd, &pid_command, sizeof(int));
+
     while(1){
 
         c_1=getchar();
@@ -101,7 +110,7 @@ int main(int argc, char *argv[]){
             case true: //reset
 
                 if(c_1 != 0){
-                    printf(BOLDRED " SYSTEM RESETTING, WAIT UNTIL IT FINISHES!!!" RESET "\n");
+                    printf("\n" BOLDRED " SYSTEM RESETTING, WAIT UNTIL IT FINISHES!!!" RESET "\n");
                     fflush(stdout);
                 }
 
@@ -121,6 +130,9 @@ int main(int argc, char *argv[]){
                         write(fd_c_to_mx, &xstop, sizeof(int));
                         kill(pid_wd, SIGUSR1);
 
+                        fprintf(out, "Pressed x, x axis stopped.\n");
+                        fflush(out);
+
                     break;
 
                     case 122: // z pressed 
@@ -130,6 +142,8 @@ int main(int argc, char *argv[]){
 
                         write(fd_c_to_mz, &zstop, sizeof(int));
                         kill(pid_wd, SIGUSR1);
+                        fprintf(out, "Pressed z, z axis stopped. \n");
+                        fflush(out);
           
 
                     break;
@@ -148,6 +162,8 @@ int main(int argc, char *argv[]){
                          
                                 write(fd_c_to_mz, &up, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
+                                fprintf(out, "Pressed up arrow, z axis increasing.\n");
+                                fflush(out);
                         
 
                             break;
@@ -159,6 +175,8 @@ int main(int argc, char *argv[]){
                    
                                 write(fd_c_to_mz, &down, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
+                                fprintf(out, "Pressed down arrow, z axis decreasing.\n");
+                                fflush(out);
                                 
 
                             break;
@@ -170,6 +188,8 @@ int main(int argc, char *argv[]){
 
                                 write(fd_c_to_mx, &right, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
+                                fprintf(out, "Pressed right arrow, x axis increasing.\n");
+                                fflush(out);
                   
                             break;
 
@@ -180,6 +200,8 @@ int main(int argc, char *argv[]){
 
                                 write(fd_c_to_mx, &left, sizeof(int));
                                 kill(pid_wd, SIGUSR1);
+                                fprintf(out, "Pressed left arrow, z axis decreasing.\n");
+                                fflush(out);
                             
                                 
                              break;

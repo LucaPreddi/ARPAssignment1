@@ -47,7 +47,7 @@ int main(int argc, char * argv[]){
 
 	fd_set rset;
 	fd_c_to_mz = open(argv[1],O_RDONLY);
-	fd_mz_to_ins = open("fifo_est_pos_z", O_WRONLY);
+	fd_mz_to_ins = open(argv[2], O_WRONLY);
 
 	if(fd_c_to_mz == -1){
 		printf("Error opening command to motor z fifo!");
@@ -78,7 +78,14 @@ int main(int argc, char * argv[]){
 
 			case true: //reset running
 
-				while(position>0.001){
+				if(position>0.001){
+
+					if(value==6){
+						
+						reset = false;
+						value = 0;
+					}
+		
 
 					position -= step;
 					usleep(10000);
@@ -87,7 +94,7 @@ int main(int argc, char * argv[]){
 
 				if (position<=0.001){
 					position=0.0;
-					value = 3;
+					value = 6;
 					reset = false;
 				}
 

@@ -36,40 +36,61 @@ void create_fifo (const char * name){
 
 int main() {
 
-char * arg_list_1[] = { "./motor_x", "fifo_command_to_mot_x", NULL };
-char * arg_list_2[] = { "./motor_z", "fifo_command_to_mot_z", NULL };
+FILE *out = fopen("debug.txt", "w");
+fprintf(out, "################# DEBUG FILE ################# \n\n");
+fflush(out);
+
+char * f_com_to_mx = "/tmp/fifo_command_to_mot_x";
+char * f_com_to_mz = "/tmp/fifo_command_to_mot_z";
+char * f_e_pos_x = "/tmp/fifo_est_pos_x";
+char * f_e_pos_z = "/tmp/fifo_est_pos_z";
+char * f_com_to_wd = "/tmp/fifo_command_to_wd";
+char * f_com_to_ins = "/tmp/fifo_command_to_ins";
+
+char * arg_list_1[] = { "./motor_x", f_com_to_mx ,f_e_pos_x, NULL };
+char * arg_list_2[] = { "./motor_z", f_com_to_mz,f_e_pos_z, NULL };
 pid_motor_x = spawn("./motor_x", arg_list_1); 
 pid_motor_z = spawn("./motor_z", arg_list_2);
 
 sprintf(pid_motor_x_a, "%d", pid_motor_x);
 sprintf(pid_motor_z_a, "%d", pid_motor_z);
 
-char * arg_list_5[] = {"./watchdog",pid_motor_x_a,pid_motor_z_a, NULL, NULL };
+char * arg_list_5[] = {"./watchdog",f_com_to_wd,pid_motor_x_a,pid_motor_z_a, NULL, NULL };
 pid_wd = spawn("./watchdog", arg_list_5);
 
 sprintf(pid_wd_a, "%d", pid_wd);
 
-char * arg_list_3[] = { "/usr/bin/konsole",  "-e", "./command", pid_wd_a , (char*)NULL };
+char * arg_list_3[] = { "/usr/bin/konsole",  "-e", "./command", pid_wd_a,
+                        f_com_to_ins,f_com_to_mx, 
+                        f_com_to_mz,f_com_to_mz,
+                        (char*)NULL };
+
 pid_command = spawn("/usr/bin/konsole", arg_list_3);
 
-char * arg_list_4[] = { "/usr/bin/konsole",  "-e", "./inspection", pid_motor_x_a, pid_motor_z_a, (char*)NULL };
+char * arg_list_4[] = { "/usr/bin/konsole",  "-e", "./inspection", pid_motor_x_a, pid_motor_z_a,
+                        f_com_to_ins,f_e_pos_x,f_e_pos_z,(char*)NULL };
+
 pid_inspection = spawn("/usr/bin/konsole", arg_list_4);
 
 
-create_fifo("fifo_command_to_mot_x");
-create_fifo("fifo_command_to_mot_z");
-create_fifo("fifo_est_pos_x");
-create_fifo("fifo_est_pos_z");
-create_fifo("fifo_command_to_ins");
+create_fifo(f_com_to_mx);
+create_fifo(f_com_to_mz);
+create_fifo(f_e_pos_x);
+create_fifo(f_e_pos_z);
+create_fifo(f_com_to_ins);
+create_fifo(f_com_to_wd);
 
 wait(NULL);
 
+fclose(out);
+
 fflush(stdout);
-unlink("fifo_command_to_mot_x");
-unlink("fifo_command_to_mot_z");
-unlink("fifo_est_pos_x");
-unlink("fifo_est_pos_z");
-unlink("fifo_command_to_ins");
+unlink(f_com_to_mx);
+unlink(f_com_to_mz);
+unlink(f_e_pos_x);
+unlink(f_e_pos_z);
+unlink(f_com_to_ins);
+unlink(f_com_to_wd);
 return 0;
 
 }

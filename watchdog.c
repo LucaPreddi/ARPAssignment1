@@ -11,22 +11,28 @@
 
 pid_t pid_motor_x;
 pid_t pid_motor_z;
+pid_t pid_command;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
 		alarm(60);
 	}
 	if(sig==SIGALRM){  // per ora killa dopo 60 sec 
-		kill(pid_motor_x, SIGKILL);
-		kill(pid_motor_z,SIGKILL);
+
+		kill(pid_motor_x, SIGUSR2);
+		kill(pid_motor_z, SIGUSR2);
+		kill(pid_command, SIGUSR2);
 	}
 }
 
 int main(int argc, char *argv[])
-{
+{	
+	int fd_c_to_wd;
 
-	pid_motor_x = atoi(argv[1]);
-	pid_motor_z = atoi(argv[2]);
+	fd_c_to_wd=open(argv[1], O_RDONLY);
+
+	pid_motor_x = atoi(argv[2]);
+	pid_motor_z = atoi(argv[3]);
 
 	struct sigaction sa;
 	memset(&sa,0,sizeof(sa));
@@ -36,6 +42,8 @@ int main(int argc, char *argv[])
 	alarm(60);
 	sigaction(SIGUSR1,&sa,NULL);
 	sigaction(SIGALRM,&sa,NULL);
+
+	read(fd_c_to_wd, &pid_command, sizeof(int));
 
 	while(1){
 

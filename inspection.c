@@ -24,10 +24,13 @@ int main(int argc, char * argv[]){
 	char c_1;
 
 	float position_x , position_z;
+	float position_x_old, position_z_old;
 
 	struct timeval tv={0,0};
 
 	fd_set rset;
+
+	FILE *out = fopen("debug.txt", "a");
  
 	static struct termios oldt, newt;
     tcgetattr( STDIN_FILENO, &oldt);
@@ -35,11 +38,11 @@ int main(int argc, char * argv[]){
     newt.c_lflag &= ~(ICANON);          
     tcsetattr( STDIN_FILENO, TCSANOW, &newt);
 
-    fd_command_to_ins = open("fifo_command_to_ins", O_RDONLY);
+    fd_command_to_ins = open(argv[3], O_RDONLY);
 
-	fd_mx_to_ins = open("fifo_est_pos_x",O_RDONLY);
+	fd_mx_to_ins = open(argv[4],O_RDONLY);
 
-	fd_mz_to_ins = open("fifo_est_pos_z",O_RDONLY);
+	fd_mz_to_ins = open(argv[5],O_RDONLY);
 
 	if (fd_mx_to_ins == -1 || fd_mz_to_ins == -1 || fd_command_to_ins == -1){
 		printf("Error opening mx to inspection fifo!");
@@ -88,6 +91,8 @@ int main(int argc, char * argv[]){
 					fflush(stdout);
 					kill(pid_motor_x, SIGUSR1);
 					kill(pid_motor_z, SIGUSR1);
+					kill(pid_command,SIGUSR1);
+					fprintf(out, "Stop button pressed.\n");
 				}
 				if(c_1=='r'){
 
@@ -96,6 +101,7 @@ int main(int argc, char * argv[]){
 					kill(pid_motor_x,SIGUSR2);
 					kill(pid_motor_z,SIGUSR2);
 					kill(pid_command,SIGUSR2);
+					fprintf(out, "Reset button pressed.\n");
 				}
 			}
 		}
@@ -106,6 +112,7 @@ int main(int argc, char * argv[]){
 
 		printf("\r  La posizione lungo x è: %f m, La posizione lungo z è: %f m", position_x, position_z);
 		fflush(stdout);
+  		fflush(out);
 	}
 	tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
 	return 0;
