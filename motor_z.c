@@ -35,6 +35,7 @@ int main(int argc, char * argv[]){
 
 	int fd_c_to_mz, fd_mz_to_ins;
 	int ret;
+	int err = (rand()%(5)) - (rand()%(5));
 
 	struct timeval tv={0,0};
 
@@ -65,7 +66,7 @@ int main(int argc, char * argv[]){
         ret=select(FD_SETSIZE, &rset, NULL, NULL, &tv);
 
 		if(ret==-1){
-			printf("There's an error opening the fifo.");
+			printf("There's an error opening the fifo. MOTOR Z\n");
 			fflush(stdout);
 		}
 		else if(ret>=0){
@@ -78,20 +79,21 @@ int main(int argc, char * argv[]){
 
 			case true: //reset running
 
-				if(position>1){
+				if(position>step){
 
 					if(value==6){
 						
 						reset = false;
 						value = 0;
 					}
+		
 
-					position -= step;
+					position -= step+err;
 					usleep(10000);
 					write(fd_mz_to_ins, &position, sizeof(int));		
 				}
 
-				if (position<=1){
+				if (position<=step){
 					position=0;
 					value = 6;
 					reset = false;
@@ -108,7 +110,7 @@ int main(int argc, char * argv[]){
 						if (position>=6000){
 						}
 						else{
-							position+=step;
+							position+= step+err;
 						}
 						usleep(10000);
 
@@ -116,10 +118,10 @@ int main(int argc, char * argv[]){
 
 					case 5:
 
-						if (position<=0.0){
+						if (position<=0){
 						}
 						else {
-							position-=step;
+							position-=step+err;
 						}
 						usleep(10000);
 

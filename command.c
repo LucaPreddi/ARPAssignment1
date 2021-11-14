@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <string.h>
 #include <termios.h>
+#include <errno.h>
 
 #define BOLDBLACK "\033[1m\033[30m" /* Bold Black */
 #define BOLDRED "\033[1m\033[31m" /* Bold Red */
@@ -18,6 +19,8 @@
 #define BOLDCYAN "\033[1m\033[36m" /* Bold Cyan */
 #define BOLDWHITE "\033[1m\033[37m" /* Bold White */
 #define RESET "\033[0m"
+
+#define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stderr,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
 
 typedef enum {
     false,
@@ -30,7 +33,9 @@ void sighandler(int sig){
 
     if(sig==SIGUSR2){
         reset = true;
-        printf("\n" BOLDRED " SYSTEM RESETTING" RESET "\n");
+        printf("\n" BOLDBLUE "  SYSTEM RESETTING" RESET "\n");
+        fflush(stdout);
+        printf("\n" BOLDYELLOW "  COMMAND DISABLED" RESET "\n");
         fflush(stdout);
     }
     if(sig==SIGUSR1){
@@ -77,19 +82,17 @@ int main(int argc, char *argv[]){
     newt.c_lflag &= ~(ICANON);          
     tcsetattr( STDIN_FILENO, TCSANOW, &newt);
 
-    fd_c_to_ins=open(argv[2] ,O_WRONLY);
-    
-    fd_c_to_mx=open(argv[3], O_WRONLY);
+    fd_c_to_ins=CHECK(open(argv[2] ,O_WRONLY));
+    fd_c_to_mx=CHECK(open(argv[3], O_WRONLY));
+    fd_c_to_mz=CHECK(open(argv[4], O_WRONLY));
+    fd_c_to_wd=CHECK(open(argv[5], O_WRONLY));
 
-    fd_c_to_mz=open(argv[4], O_WRONLY);
+    printf("\n" BOLDMAGENTA"  ###################" RESET "\n");
+    printf(BOLDMAGENTA "  # COMMAND KONSOLE #" RESET "\n");
+    printf(BOLDMAGENTA"  ###################" RESET "\n\n");
 
-    fd_c_to_wd=open(argv[5], O_WRONLY);
-    
-    if (fd_c_to_mx==-1 || fd_c_to_mz == -1 || fd_c_to_ins==-1 || fd_c_to_wd==-1){
-        printf("Error while trying to open pipes");
-    }
-
-    printf("\n" BOLDRED "  Welcome to you my friend, this is a simulator of a hoist robot!" RESET "\n");    
+    printf(BOLDRED "  Welcome to you my friend, this is a simulator of a hoist robot!" RESET);    
+    printf("\n" BOLDRED "  Created by Matteo Carlone and Luca Predieri." RESET "\n\n");    
     printf(BOLDYELLOW "  Here there's a list of commands:" RESET "\n");
     printf(BOLDGREEN "  If you want to move, press right arrow!" RESET "\n");
     printf(BOLDCYAN "  If you want to move back, press left arrow!" RESET "\n");
@@ -124,7 +127,7 @@ int main(int argc, char *argv[]){
 
                     case 120: // x pressed
 
-                        printf(BOLDRED "\n  STOP X  %c" RESET "\n", c_1);
+                        printf("\n" BOLDRED "  X Axis Stopped" RESET "\n");
                         fflush(stdout);
 
                         write(fd_c_to_mx, &xstop, sizeof(int));
@@ -137,7 +140,7 @@ int main(int argc, char *argv[]){
 
                     case 122: // z pressed 
 
-                        printf(BOLDRED "\n  STOP Z  %c" RESET "\n", c_1);
+                        printf("\n" BOLDRED "  Z Axis Stopped" RESET "\n");
                         fflush(stdout);
 
                         write(fd_c_to_mz, &zstop, sizeof(int));
@@ -157,7 +160,7 @@ int main(int argc, char *argv[]){
 
                             case 65:
 
-                            	printf("\n  Freccetta in alto\n");
+                            	printf("\n" BOLDGREEN "  UP Arrow" RESET "\n");
                                 fflush(stdout);
                          
                                 write(fd_c_to_mz, &up, sizeof(int));
@@ -170,7 +173,7 @@ int main(int argc, char *argv[]){
 
                             case 66:
 
-                            	printf("\n  Freccetta in basso\n");
+                            	printf("\n" BOLDGREEN"  DOWN Arrow" RESET "\n");
                                 fflush(stdout);
                    
                                 write(fd_c_to_mz, &down, sizeof(int));
@@ -183,7 +186,7 @@ int main(int argc, char *argv[]){
 
                             case 67:
 
-                            	printf("\n  Freccetta a destra\n");
+                            	printf("\n" BOLDGREEN "  RIGHT Arrow" RESET "\n");
                                 fflush(stdout);
 
                                 write(fd_c_to_mx, &right, sizeof(int));
@@ -195,7 +198,7 @@ int main(int argc, char *argv[]){
 
                             case 68:
 
-                            	printf("\n  Freccetta_a_sinistra\n");
+                            	printf("\n"BOLDGREEN"  LEFT ARROW"RESET"\n");
                                 fflush(stdout);
 
                                 write(fd_c_to_mx, &left, sizeof(int));
@@ -212,7 +215,7 @@ int main(int argc, char *argv[]){
 
                     default:
 
-                        printf(BOLDRED " Command Not Allowed" RESET "\n");
+                        printf("\n"BOLDRED "  Command Not Allowed" RESET "\n");
                         fflush(stdout);
 
                         

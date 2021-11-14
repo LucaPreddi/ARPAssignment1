@@ -66,7 +66,7 @@ int main(int argc, char * argv[]){
         ret=select(FD_SETSIZE, &rset, NULL, NULL, &tv);
 
 		if(ret==-1){
-			printf("There's an error on the ret");
+			printf("There's an error opening the fifo. MOTOR X\n");
 			fflush(stdout);
 		}
 		else if(ret>=0){
@@ -79,7 +79,7 @@ int main(int argc, char * argv[]){
 
 			case true: //reset running
 
-				if(position>1){
+				if(position>step){
 
 					if(value==3){
 
@@ -90,14 +90,13 @@ int main(int argc, char * argv[]){
 
 					position -= step;
 					usleep(10000);
-					write(fd_mx_to_ins, &position, sizeof(float));
+					write(fd_mx_to_ins, &position, sizeof(int));
 
 				}
-				if (position<=1){
+				if (position<=step){
 
 					position=0;
 					value = 3;
-					fflush(stdout);
 					reset = false;
 				} 
 
@@ -130,12 +129,13 @@ int main(int argc, char * argv[]){
 					case 3:
 						usleep(10000);
 						value = 0;
+
 					break;
 				}
 
 			if (position>6000) position=6000;
 			if (position<0) position=0;
-			write(fd_mx_to_ins, &position, sizeof(float));	
+			write(fd_mx_to_ins, &position, sizeof(int));	
 
 			break;
 

@@ -8,9 +8,11 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <time.h>
 
 #define BHGRN "\e[1;92m"
 #define BHRED "\e[1;91m"
+#define BHWHT "\e[1;97m"
 #define RESET "\033[0m"
 #define BHYEL "\e[1;93m"
 
@@ -24,6 +26,8 @@ int main(int argc, char * argv[]){
 	char c_1;
 
 	int position_x , position_z;
+	
+	time_t current_time;
 
 	struct timeval tv={0,0};
 
@@ -66,6 +70,8 @@ int main(int argc, char * argv[]){
         FD_SET(0,&rset);
         ret=select(FD_SETSIZE, &rset, NULL, NULL, &tv);
 
+        time(&current_time);
+
 		if(ret==-1){
 			printf("There's an error on select.");
 			fflush(stdout);
@@ -92,6 +98,7 @@ int main(int argc, char * argv[]){
 					kill(pid_motor_z, SIGUSR1);
 					kill(pid_command,SIGUSR1);
 					fprintf(out, "Stop button pressed.\n");
+					fprintf(out, "Time:  %s\n", ctime(&current_time));
 				}
 				if(c_1=='r'){
 
@@ -109,7 +116,7 @@ int main(int argc, char * argv[]){
 			kill(pid_command, SIGUSR1);
 		}
 
-		printf("\r  La posizione lungo x è: %d m, La posizione lungo z è: %d m", position_x, position_z);
+		printf(BHWHT "\r  La posizione lungo x è: %d m, La posizione lungo z è: %d m" RESET, position_x, position_z);
 		fflush(stdout);
   		fflush(out);
 	}

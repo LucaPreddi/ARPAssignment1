@@ -27,9 +27,11 @@ void sighandler(int sig){
 
 int main(int argc, char *argv[])
 {	
+
 	int fd_c_to_wd;
 
 	fd_c_to_wd=open(argv[1], O_RDONLY);
+	
 
 	pid_motor_x = atoi(argv[2]);
 	pid_motor_z = atoi(argv[3]);
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
 
 	while(1){
 
-
+	
 		sleep(1);
 
 
