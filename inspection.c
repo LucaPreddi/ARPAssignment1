@@ -56,9 +56,9 @@ int main(int argc, char * argv[]){
 	pid_motor_x = atoi(argv[1]);
 	pid_motor_z = atoi(argv[2]);
 
-	printf("\n" BHGRN"  #############" RESET "\n");
-	printf(BHGRN "  # INSPECTOR #" RESET "\n");
-	printf(BHGRN"  #############" RESET "\n\n");
+	printf("\n" BHGRN"  ######################" RESET "\n");
+	printf(BHGRN "  # INSPECTION KONSOLE #" RESET "\n");
+	printf(BHGRN"  ######################" RESET "\n\n");
 
 	read(fd_command_to_ins,&pid_command, sizeof(int));
 
@@ -97,8 +97,8 @@ int main(int argc, char * argv[]){
 					kill(pid_motor_x, SIGUSR1);
 					kill(pid_motor_z, SIGUSR1);
 					kill(pid_command,SIGUSR1);
-					fprintf(out, "Stop button pressed.\n");
-					fprintf(out, "Time:  %s\n", ctime(&current_time));
+					fprintf(out, "Stop button pressed. ");
+					fprintf(out, "Time:  %s", ctime(&current_time));
 				}
 				if(c_1=='r'){
 
@@ -107,7 +107,8 @@ int main(int argc, char * argv[]){
 					kill(pid_motor_x,SIGUSR2);
 					kill(pid_motor_z,SIGUSR2);
 					kill(pid_command,SIGUSR2);
-					fprintf(out, "Reset button pressed.\n");
+					fprintf(out, "Reset button pressed.");
+					fprintf(out, "Time:  %s", ctime(&current_time));
 				}
 			}
 		}
