@@ -10,11 +10,11 @@
 #include <string.h>
 #include <time.h>
 
-#define BHGRN "\e[1;92m"
 #define BHRED "\e[1;91m"
 #define BHWHT "\e[1;97m"
-#define RESET "\033[0m"
 #define BHYEL "\e[1;93m"
+#define BHMGN "\033[1m\033[35m"
+#define RESET "\033[0m"
 
 pid_t pid_command;
 
@@ -56,9 +56,9 @@ int main(int argc, char * argv[]){
 	pid_motor_x = atoi(argv[1]);
 	pid_motor_z = atoi(argv[2]);
 
-	printf("\n" BHGRN"  ######################" RESET "\n");
-	printf(BHGRN "  # INSPECTION KONSOLE #" RESET "\n");
-	printf(BHGRN"  ######################" RESET "\n\n");
+	printf("\n" BHMGN"  ######################" RESET "\n");
+	printf(BHMGN "  # INSPECTION KONSOLE #" RESET "\n");
+	printf(BHMGN"  ######################" RESET "\n\n");
 
 	read(fd_command_to_ins,&pid_command, sizeof(int));
 
