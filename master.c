@@ -129,6 +129,7 @@ int main() {
                           f_com_to_ins,
                           f_e_pos_x,
                           f_e_pos_z,
+                          pid_wd_a,
                           (char*)NULL };
   pid_inspection = spawn("/usr/bin/konsole", arg_list_4);
 

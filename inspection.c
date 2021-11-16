@@ -27,7 +27,7 @@ int main(int argc, char * argv[]){
 
 	int fd_mx_to_ins , fd_mz_to_ins, fd_command_to_ins;
 	int position_x , position_z;
-	int pid_motor_x, pid_motor_z;
+	pid_t pid_motor_x, pid_motor_z, pid_wd;
 	int ret;
 	
 	char c_1;
@@ -55,6 +55,7 @@ int main(int argc, char * argv[]){
 
 	pid_motor_x = atoi(argv[1]);
 	pid_motor_z = atoi(argv[2]);
+	pid_wd = atoi(argv[6]);
 
 	printf("\n" BHMGN"  ######################" RESET "\n");
 	printf(BHMGN "  # INSPECTION KONSOLE #" RESET "\n");
@@ -90,9 +91,12 @@ int main(int argc, char * argv[]){
 
 					printf("\n"BHRED "  EMERGENCY STOP" RESET "\n");
 					fflush(stdout);
+
+					CHECK(kill(pid_command, SIGUSR1));
 					CHECK(kill(pid_motor_x, SIGUSR1));
 					CHECK(kill(pid_motor_z, SIGUSR1));
-					CHECK(kill(pid_command, SIGUSR1));
+					CHECK(kill(pid_wd,SIGUSR1));
+					
 					fprintf(out, "Stop button pressed. ");
 					fprintf(out, "Time:  %s", ctime(&current_time));
 				}
@@ -100,9 +104,12 @@ int main(int argc, char * argv[]){
 
 					printf("\n"BHYEL "  RESET" RESET "\n");
 					fflush(stdout);
+
+					CHECK(kill(pid_command,SIGUSR2));
 					CHECK(kill(pid_motor_x,SIGUSR2));
 					CHECK(kill(pid_motor_z,SIGUSR2));
-					CHECK(kill(pid_command,SIGUSR2));
+					CHECK(kill(pid_wd,SIGUSR1));
+					
 					fprintf(out, "Reset button pressed.");
 					fprintf(out, "Time:  %s", ctime(&current_time));
 				}

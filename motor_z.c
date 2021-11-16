@@ -29,6 +29,7 @@ int step=1;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
+		reset = false;
 		value=6;
 	}
 	if(sig==SIGUSR2){
@@ -41,7 +42,7 @@ int main(int argc, char * argv[]){
 
 	int fd_c_to_mz, fd_mz_to_ins;
 	int ret;
-	int err = (rand()%(5)) - (rand()%(5));
+	int err = (rand()%(1)) - (rand()%(1));
 
 	struct timeval tv={0,0};
 
@@ -74,11 +75,11 @@ int main(int argc, char * argv[]){
 
 				if(position>step){
 
-					if(value==6){
+					//if(value==6){
 						
-						reset = false;
-						value = 0;
-					}
+						//reset = false;
+						//value = 0;
+					//}
 		
 
 					position -= step+err;
@@ -122,7 +123,7 @@ int main(int argc, char * argv[]){
 
 					case 6:
 						usleep(10000);
-						value = 0;
+						//value = 0;
 					break;
 				}
 

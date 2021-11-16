@@ -29,6 +29,7 @@ int step=1;
 
 void sighandler(int sig){
 	if(sig==SIGUSR1){
+		reset = false;
 		value=3;
 	}
 	if(sig==SIGUSR2){
@@ -74,12 +75,12 @@ int main(int argc, char * argv[]){
 
 				if(position>step){
 
-					if(value==3){
+					//if(value==3){
 
-						reset =false;
-						value = 0;
+						//reset =false;
+						//value = 0;
 
-					}
+					//}
 
 					position -= step;
 					usleep(10000);
@@ -121,7 +122,7 @@ int main(int argc, char * argv[]){
 
 					case 3:
 						usleep(10000);
-						value = 0;
+						//value = 0;
 
 					break;
 				}

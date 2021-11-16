@@ -144,11 +144,11 @@ int main(int argc, char *argv[]){
 
     // Now we are going to study the loop part of command process.
 
-    while(1){
+    while(c_1=getchar()){
 
         // Reading the input on the command console.
 
-        c_1=getchar();
+        
 
         switch(reset){
 

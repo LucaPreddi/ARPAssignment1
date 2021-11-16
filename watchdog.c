@@ -25,9 +25,10 @@ void sighandler(int sig){
 	}
 	if(sig==SIGALRM){  // per ora killa dopo 60 sec 
 
+		CHECK(kill(pid_command, SIGUSR2));
 		CHECK(kill(pid_motor_x, SIGUSR2));
 		CHECK(kill(pid_motor_z, SIGUSR2));
-		CHECK(kill(pid_command, SIGUSR2));
+		
 	}
 }
 
