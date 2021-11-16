@@ -9,6 +9,12 @@
 #include <string.h>
 #include <sys/wait.h>
 
+// Defining CHECK() tool. We use this error checking method to make the
+// code lighter and more fancy, using errno.
+
+#define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stderr,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
+
+
 typedef enum {
 	false,
 	true
@@ -47,31 +53,18 @@ int main(int argc, char * argv[]){
 	sigaction(SIGUSR2, &sa, NULL);
 
 	fd_set rset;
-	fd_c_to_mz = open(argv[1],O_RDONLY);
-	fd_mz_to_ins = open(argv[2], O_WRONLY);
-
-	if(fd_c_to_mz == -1){
-		printf("Error opening command to motor z fifo!");
-		return(5);
-	}
-	if(fd_mz_to_ins == -1){
-		printf("Error opening motor z to inspection fifo!");
-		return(5);
-	}
+	fd_c_to_mz = CHECK(open(argv[1],O_RDONLY));
+	fd_mz_to_ins = CHECK(open(argv[2], O_WRONLY));
 
 	while(1){
 
 		FD_ZERO(&rset);
         FD_SET(fd_c_to_mz, &rset);
-        ret=select(FD_SETSIZE, &rset, NULL, NULL, &tv);
+        ret = CHECK(select(FD_SETSIZE, &rset, NULL, NULL, &tv));
 
-		if(ret==-1){
-			printf("There's an error opening the fifo. MOTOR Z\n");
-			fflush(stdout);
-		}
-		else if(ret>=0){
+		if(ret>=0){
 			if (FD_ISSET(fd_c_to_mz, &rset)>0){
-				read(fd_c_to_mz, &value, sizeof(int));
+				CHECK(read(fd_c_to_mz, &value, sizeof(int)));
 			}
 		}
 
@@ -90,7 +83,7 @@ int main(int argc, char * argv[]){
 
 					position -= step+err;
 					usleep(10000);
-					write(fd_mz_to_ins, &position, sizeof(int));		
+					CHECK(write(fd_mz_to_ins, &position, sizeof(int)));		
 				}
 
 				if (position<=step){
@@ -135,7 +128,8 @@ int main(int argc, char * argv[]){
 
 			if (position>6000) position=6000;
 			if (position<0) position=0;
-			write(fd_mz_to_ins, &position, sizeof(int));		
+			
+			CHECK(write(fd_mz_to_ins, &position, sizeof(int)));		
 
 			break;
 		}

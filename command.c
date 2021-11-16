@@ -25,7 +25,7 @@
 #define RESET "\033[0m"
 
 // Defining CHECK() tool. We use this error checking method to make the
-// code lighter and more fancy.
+// code lighter and more fancy, using errno.
 
 #define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stderr,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
 
@@ -50,6 +50,7 @@ bool reset = false;
 void sighandler(int sig){
 
     if(sig==SIGUSR2){
+
         reset = true;
         printf("\n" BOLDBLUE "  SYSTEM RESETTING" RESET "\n");      // BOLDBLUE, BOLDYELLOW, RESET
         fflush(stdout);                                             // are macros to color the text
@@ -57,9 +58,7 @@ void sighandler(int sig){
         fflush(stdout);
     }
 
-    if(sig==SIGUSR1){
-        reset = false;
-    }
+    if(sig==SIGUSR1) reset = false;
 
 }
 
@@ -110,18 +109,18 @@ int main(int argc, char *argv[]){
     // The first argument is an open file descriptor associated with a 
     // terminal. STDIN_FILENO is the default standard input fd (0).
 
-    tcgetattr( STDIN_FILENO, &oldt);
+    CHECK(tcgetattr( STDIN_FILENO, &oldt));
     newt = oldt;
-    newt.c_lflag &= ~(ICANON);                      // This makes the standard input taking values     
-    tcsetattr( STDIN_FILENO, TCSANOW, &newt);       // without waiting for enter to be pressed.
+    newt.c_lflag &= ~(ICANON);                              // This makes the standard input taking values     
+    CHECK(tcsetattr( STDIN_FILENO, TCSANOW, &newt));        // without waiting for enter to be pressed.
 
     // Now we want to open the fifos and use them to make command process
     // communicating with the other processes.
 
-    fd_c_to_ins=CHECK(open(argv[2] ,O_WRONLY));
-    fd_c_to_mx=CHECK(open(argv[3], O_WRONLY));
-    fd_c_to_mz=CHECK(open(argv[4], O_WRONLY));
-    fd_c_to_wd=CHECK(open(argv[5], O_WRONLY));
+    fd_c_to_ins = CHECK(open(argv[2] ,O_WRONLY));
+    fd_c_to_mx = CHECK(open(argv[3], O_WRONLY));
+    fd_c_to_mz = CHECK(open(argv[4], O_WRONLY));
+    fd_c_to_wd = CHECK(open(argv[5], O_WRONLY));
 
     // Printing on the console informations about the simulator.
 
@@ -140,8 +139,8 @@ int main(int argc, char *argv[]){
 
     // Passing the command PID to inspection and watchdog process.
 
-    write(fd_c_to_ins, &pid_command, sizeof(int));
-    write(fd_c_to_wd, &pid_command, sizeof(int));
+    CHECK(write(fd_c_to_ins, &pid_command, sizeof(int)));
+    CHECK(write(fd_c_to_wd, &pid_command, sizeof(int)));
 
     // Now we are going to study the loop part of command process.
 
@@ -181,8 +180,8 @@ int main(int argc, char *argv[]){
                         printf("\n" BOLDRED "  X Axis Stopped" RESET "\n");
                         fflush(stdout);
 
-                        write(fd_c_to_mx, &xstop, sizeof(int));
-                        kill(pid_wd, SIGUSR1);
+                        CHECK(write(fd_c_to_mx, &xstop, sizeof(int)));
+                        CHECK(kill(pid_wd, SIGUSR1));
 
                         fprintf(out, "Pressed x, x axis stopped.\n");
                         fflush(out);
@@ -198,8 +197,9 @@ int main(int argc, char *argv[]){
                         printf("\n" BOLDRED "  Z Axis Stopped" RESET "\n");
                         fflush(stdout);
 
-                        write(fd_c_to_mz, &zstop, sizeof(int));
-                        kill(pid_wd, SIGUSR1);
+                        CHECK(write(fd_c_to_mz, &zstop, sizeof(int)));
+                        CHECK(kill(pid_wd, SIGUSR1));
+
                         fprintf(out, "Pressed z, z axis stopped. \n");
                         fflush(out);
     
@@ -223,11 +223,11 @@ int main(int argc, char *argv[]){
                             	printf("\n" BOLDGREEN "  UP Arrow" RESET "\n");
                                 fflush(stdout);
 
-                                write(fd_c_to_mz, &up, sizeof(int));
-                                kill(pid_wd, SIGUSR1);
+                                CHECK(write(fd_c_to_mz, &up, sizeof(int)));
+                                CHECK(kill(pid_wd, SIGUSR1));
+
                                 fprintf(out, "Pressed up arrow, z axis increasing.\n");
                                 fflush(out);
-                        
 
                             break;
 
@@ -240,8 +240,9 @@ int main(int argc, char *argv[]){
                             	printf("\n" BOLDGREEN"  DOWN Arrow" RESET "\n");
                                 fflush(stdout);
 
-                                write(fd_c_to_mz, &down, sizeof(int));
-                                kill(pid_wd, SIGUSR1);
+                                CHECK(write(fd_c_to_mz, &down, sizeof(int)));
+                                CHECK(kill(pid_wd, SIGUSR1));
+
                                 fprintf(out, "Pressed down arrow, z axis decreasing.\n");
                                 fflush(out);
                                 
@@ -257,8 +258,9 @@ int main(int argc, char *argv[]){
                             	printf("\n" BOLDGREEN "  RIGHT Arrow" RESET "\n");
                                 fflush(stdout);
 
-                                write(fd_c_to_mx, &right, sizeof(int));
-                                kill(pid_wd, SIGUSR1);
+                                CHECK(write(fd_c_to_mx, &right, sizeof(int)));
+                                CHECK(kill(pid_wd, SIGUSR1));
+
                                 fprintf(out, "Pressed right arrow, x axis increasing.\n");
                                 fflush(out);
                   
@@ -273,8 +275,9 @@ int main(int argc, char *argv[]){
                             	printf("\n"BOLDGREEN"  LEFT ARROW"RESET"\n");
                                 fflush(stdout);
 
-                                write(fd_c_to_mx, &left, sizeof(int));
-                                kill(pid_wd, SIGUSR1);
+                                CHECK(write(fd_c_to_mx, &left, sizeof(int)));
+                                CHECK(kill(pid_wd, SIGUSR1));
+
                                 fprintf(out, "Pressed left arrow, z axis decreasing.\n");
                                 fflush(out);
                             
@@ -302,14 +305,14 @@ int main(int argc, char *argv[]){
 
     // Then we close all the file descriptors.
 
-    close(fd_c_to_mx);
-    close(fd_c_to_mz);
-    close(fd_c_to_ins);
+    CHECK(close(fd_c_to_mx));
+    CHECK(close(fd_c_to_mz));
+    CHECK(close(fd_c_to_ins));
 
     // With this command we make the command console to 
     // take inputs again with pressing enter.
 
-    tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+    CHECK(tcsetattr( STDIN_FILENO, TCSANOW, &oldt));
 
     // Returning value.
 
