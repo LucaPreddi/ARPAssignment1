@@ -1,6 +1,7 @@
 ################ THE ML99 HOIST ROBOT SIMULATOR ################
 
 HOW TO INSTALL THE SIMULATOR.
+
 Steps to install (all the commands are on the console):
 	- Run ./install.sh <pathname> 
 	- Open <pathname>
@@ -11,7 +12,9 @@ are some files .txt to explain the tasks of the script.
 If you don't know how the scripts work, you can see all the .txt
 files showed one by one. Use the command:
 	- Run ./help.sh
+	
 INFORMATIONS ABOUT THE SIMULATOR.
+
 Welcome to the ML99 simulator of an hoist robot. The robot is a 
 double axis robot, x and z. The simulator has two different con-
 soles where the user can use different commands.
@@ -37,3 +40,4 @@ All the informations of your use and all the commands you press-
 ed are stored inside the 'logfile' folder inside the 'sources' 
 folder. Remember that everytime you run the program this file w-
 ill be reset.
+

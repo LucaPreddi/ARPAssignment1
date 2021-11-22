@@ -1,0 +1,16 @@
+###################### MOTOR_X SCRIPT ######################
+
+We can say that both motor_x and motor_z are the core of the
+program, if not the core, they are (indeed) the motor. The 
+two processes manage the position of the hoist robot with d-
+ifferent istructions. The main activity is managed thanks t-
+o a while() loop which loops endlessy. This let the robot m-
+ove as long as some instructions are okay with that. We hav-
+e a switch case which permits to use the different inputs t-
+hat come from the other processes (command or inspection) a-
+nd it works as the last input wants. These inputs can either
+be signals or FIFOs, as long as they're signals it's all ok-
+ay, when they're FIFOs we want to read them when there's ac-
+tually data in it, so we decided to use the select() system 
+call. All the system calls errors are managed with the 
+CHECK() tool.

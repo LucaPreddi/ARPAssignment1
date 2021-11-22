@@ -10,7 +10,7 @@ if [ ! -d $1 ]
 then
  echo "Error: Directory $1 DOES NOT exist.";
  while true; do
-  read -p "Do you wish to create $1 directory? [Y/n] " yn
+  read -p "Do you want to create $1 directory? [Y/n] " yn
   case $yn in
    [Y]* ) mkdir $1; break;;
    [n]* ) exit;;
@@ -24,6 +24,7 @@ echo "Begin program installation on $1 ... ";
 
 mv run.sh $1
 mv help.sh $1
+cp info.txt $1
 unzip sources.zip -d $1;
 
 echo "Begin sources' compilation ...";
