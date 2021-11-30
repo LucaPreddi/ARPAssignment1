@@ -57,9 +57,13 @@ int main(int argc, char * argv[]){
 	pid_motor_z = atoi(argv[2]);
 	pid_wd = atoi(argv[6]);
 
-	printf("\n" BHMGN"  ######################" RESET "\n");
-	printf(BHMGN "  # INSPECTION KONSOLE #" RESET "\n");
-	printf(BHMGN"  ######################" RESET "\n\n");
+	printf(BHMGN " ######################################################################################" RESET "\n");
+	printf(BHMGN " #  _ _____ _____ _____ _____ _____ _____ _ _____ _____    _                   _      #" RESET "\n");
+	printf(BHMGN " # |_|   | |   __|  _  |   __|     |_   _|_|     |   | |  | |_ ___ ___ ___ ___| |___  #" RESET "\n");
+	printf(BHMGN " # | | | | |__   |   __|   __|   --| | | | |  |  | | | |  | '_| . |   |_ -| . | | -_| #" RESET "\n");
+	printf(BHMGN " # |_|_|___|_____|__|  |_____|_____| |_| |_|_____|_|___|  |_,_|___|_|_|___|___|_|___| #" RESET "\n");
+	printf(BHMGN " #                                                                                    #" RESET "\n");
+	printf(BHMGN " ######################################################################################" RESET "\n\n");
 
 	read(fd_command_to_ins,&pid_command, sizeof(int));
 

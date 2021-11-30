@@ -11,6 +11,8 @@
 #include <string.h>
 #include <termios.h>
 #include <errno.h>
+#include <time.h>
+
 
 // Defining colors of the lines in the console.
 
@@ -75,6 +77,11 @@ int main(int argc, char *argv[]){
         printf("ERRROR OPEN FILE");
     }
 
+    //time
+    
+    time_t current_time;
+    struct timeval tv={0,0};
+
     // Declaring local integer variables, they are grouped to get a better  
     // look of the code and making it easier to modify or fix.
 
@@ -87,6 +94,8 @@ int main(int argc, char *argv[]){
 
     pid_t pid_command = getpid();
     pid_t pid_wd = atoi(argv[1]);
+
+    fprintf(out, "PID ./command: %d\n\n", pid_command);
 
     // declaring the two termios structs.
 
@@ -123,9 +132,13 @@ int main(int argc, char *argv[]){
 
     // Printing on the console informations about the simulator.
 
-    printf("\n" BOLDMAGENTA"  ###################" RESET "\n");
-    printf(BOLDMAGENTA "  # COMMAND KONSOLE #" RESET "\n");
-    printf(BOLDMAGENTA"  ###################" RESET "\n\n");
+    printf(BOLDMAGENTA "\n" " ############################################################################" RESET "\n");
+    printf(BOLDMAGENTA " #  _____ _____ _____ _____ _____ _____ ____     _                   _      #\n");
+    printf(BOLDMAGENTA " # |     |     |     |     |  _  |   | |    |   | |_ ___ ___ ___ ___| |___  #\n");
+    printf(BOLDMAGENTA " # |   --|  |  | | | | | | |     | | | |  |  |  | '_| . |   |_ -| . | | -_| #" RESET "\n");
+    printf(BOLDMAGENTA " # |_____|_____|_|_|_|_|_|_|__|__|_|___|____/   |_,_|___|_|_|___|___|_|___| #" RESET "\n");
+    printf(BOLDMAGENTA " #                                                                          #" RESET "\n");
+    printf(BOLDMAGENTA " ############################################################################" RESET "\n\n");
 
     printf(BOLDRED "  Welcome to you my friend, this is a simulator of a hoist robot!" RESET);    
     printf("\n" BOLDRED "  Created by Matteo Carlone and Luca Predieri." RESET "\n\n");    
@@ -140,11 +153,17 @@ int main(int argc, char *argv[]){
 
     CHECK(write(fd_c_to_ins, &pid_command, sizeof(int)));
     CHECK(write(fd_c_to_wd, &pid_command, sizeof(int)));
+    CHECK(close(fd_c_to_ins));
+    CHECK(close(fd_c_to_wd));
 
     // Now we are going to study the loop part of command process.
 
     while(c_1 = getchar()){
 
+        // Time stuff.
+
+        time(&current_time);
+    
         // Reading the input on the command console.
 
         switch(reset){
@@ -184,7 +203,7 @@ int main(int argc, char *argv[]){
                         CHECK(write(fd_c_to_mx, &xstop, sizeof(int)));
                         CHECK(kill(pid_wd, SIGUSR1));
 
-                        fprintf(out, "Pressed x, x axis stopped.\n");
+                        fprintf(out, "Pressed x, x axis stopped.               Time:  %s", ctime(&current_time));
                         fflush(out);
 
                     break;
@@ -201,7 +220,7 @@ int main(int argc, char *argv[]){
                         CHECK(write(fd_c_to_mz, &zstop, sizeof(int)));
                         CHECK(kill(pid_wd, SIGUSR1));
 
-                        fprintf(out, "Pressed z, z axis stopped. \n");
+                        fprintf(out, "Pressed z, z axis stopped.               Time:  %s", ctime(&current_time));
                         fflush(out);
     
                     break;
@@ -227,7 +246,7 @@ int main(int argc, char *argv[]){
                                 CHECK(write(fd_c_to_mz, &up, sizeof(int)));
                                 CHECK(kill(pid_wd, SIGUSR1));
 
-                                fprintf(out, "Pressed up arrow, z axis increasing.\n");
+                                fprintf(out, "Pressed up arrow, z axis increasing.     Time:  %s", ctime(&current_time));
                                 fflush(out);
 
                             break;
@@ -244,7 +263,7 @@ int main(int argc, char *argv[]){
                                 CHECK(write(fd_c_to_mz, &down, sizeof(int)));
                                 CHECK(kill(pid_wd, SIGUSR1));
 
-                                fprintf(out, "Pressed down arrow, z axis decreasing.\n");
+                                fprintf(out, "Pressed down arrow, z axis decreasing.   Time:  %s", ctime(&current_time));
                                 fflush(out);
                                 
 
@@ -262,7 +281,7 @@ int main(int argc, char *argv[]){
                                 CHECK(write(fd_c_to_mx, &right, sizeof(int)));
                                 CHECK(kill(pid_wd, SIGUSR1));
 
-                                fprintf(out, "Pressed right arrow, x axis increasing.\n");
+                                fprintf(out, "Pressed right arrow, x axis increasing.  Time:  %s", ctime(&current_time));
                                 fflush(out);
                   
                             break;
@@ -279,7 +298,7 @@ int main(int argc, char *argv[]){
                                 CHECK(write(fd_c_to_mx, &left, sizeof(int)));
                                 CHECK(kill(pid_wd, SIGUSR1));
 
-                                fprintf(out, "Pressed left arrow, z axis decreasing.\n");
+                                fprintf(out, "Pressed left arrow, z axis decreasing.   Time:  %s", ctime(&current_time));
                                 fflush(out);
                             
                             break;
@@ -290,9 +309,9 @@ int main(int argc, char *argv[]){
 
 
                     case 32:
-
+                        CHECK(close(fd_c_to_mx));
+                        CHECK(close(fd_c_to_mz));
                         exit(1);
-
                     break;
 
                     // If none of the right keys are pressed, we let the user know
@@ -310,19 +329,4 @@ int main(int argc, char *argv[]){
         }
 
     }
-
-    // Then we close all the file descriptors.
-
-    CHECK(close(fd_c_to_mx));
-    CHECK(close(fd_c_to_mz));
-    CHECK(close(fd_c_to_ins));
-
-    // With this command we make the command console to 
-    // take inputs again with pressing enter.
-
-    CHECK(tcsetattr( STDIN_FILENO, TCSANOW, &oldt));
-
-    // Returning value.
-
-    return 0;
 }
