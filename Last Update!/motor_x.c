@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 
 // Defining CHECK() tool. We use this error checking method to make the
-// code lighter and more fancy, using errno.
+// code lighter and fancier, using errno.
 
 #define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stderr,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
 
@@ -59,8 +59,8 @@ int main(int argc, char * argv[]){
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2,&sa,NULL);
 
-	// Declaring rset as the file descriptor set and opening the command - motor x and
-	// motor x - inspection FIFOs.
+	// Declaring rset as the file descriptor set where we put the file descriptors of those
+	// files we want to read.
 
 	fd_set rset;
 
@@ -71,12 +71,16 @@ int main(int argc, char * argv[]){
 		fd_c_to_mx = CHECK(open(argv[1],O_RDONLY));
 		fd_mx_to_ins = CHECK(open(argv[2], O_WRONLY));
 
+		// Creating error.
+
+		float err = (rand()%(1)) - (rand()%(1));
+
 		// Implementing the part of the code spent to use select() function, we want to read the FIFOs
-		// when they are ready. It means that the code does not 
+		// when they are ready. 
 
 		FD_ZERO(&rset);													// Resetting the fd_set.
         FD_SET(fd_c_to_mx, &rset);										// Putting fd of command - motor x.
-        ret = select(FD_SETSIZE, &rset, NULL, NULL, &tv);		// Calling select() function.
+        ret = select(FD_SETSIZE, &rset, NULL, NULL, &tv);				// Calling select() function.
 
         // If the FIFO is ready, we read it.
 
@@ -95,7 +99,7 @@ int main(int argc, char * argv[]){
 
 			case true:
 
-				// If the position is 
+				// If the position is higher than the step we want to decrement the value of the position.
 
 				if(position>step){
 
@@ -104,6 +108,8 @@ int main(int argc, char * argv[]){
 					CHECK(write(fd_mx_to_ins, &position, sizeof(int)));
 
 				}
+
+				// If the postion is lower than the step we want the position in its origin.
 
 				if (position<=step){
 
@@ -121,40 +127,48 @@ int main(int argc, char * argv[]){
 		
 				switch(value){
 
+					// We want to increase the position.
+
 					case 1:
 						if (position>=6000){
 						}
 						else{
-							position+=step;
+							position+=step+err;
 						}
 						usleep(10000);
 
 					break;
+
+					// We want to decrease the position.
 
 					case 2:
 						if (position<=0){
 						}
 						else {
-							position-=step;
+							position-=step+err;
 						}
 						usleep(10000);
 					break;
 
+					// If the robot is stopped we want it to stop.
+
 					case 3:
 						usleep(10000);
-						//value = 0;
-
 					break;
 				}
 
-			if (position>6000) position=6000;
-			if (position<0) position=0;
+			if (position>6000) position = 6000;
+			if (position<0) position = 0;
+
+			// Writing the postition to the inspection console.
 
 			CHECK(write(fd_mx_to_ins, &position, sizeof(int)));	
 
 			break;
 
 		}
+
+	// Closing all the file descriptors.
 
 	CHECK(close(fd_c_to_mx));
 	CHECK(close(fd_mx_to_ins));

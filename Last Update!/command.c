@@ -16,14 +16,13 @@
 
 // Defining colors of the lines in the console.
 
-#define BOLDBLACK "\033[1m\033[30m"     // Bold Black.
-#define BOLDRED "\033[1m\033[31m"       // Bold Red.
-#define BOLDGREEN "\033[1m\033[32m"     // Bold Green.
-#define BOLDYELLOW "\033[1m\033[33m"    // Bold Yellow.
-#define BOLDBLUE "\033[1m\033[34m"      // Bold Blue.
-#define BOLDMAGENTA "\033[1m\033[35m"   // Bold Magenta.
-#define BOLDCYAN "\033[1m\033[36m"      // Bold Cyan.
-#define BOLDWHITE "\033[1m\033[37m"     // Bold White.
+#define BHRED "\e[1;91m"       // Bold Red. ..
+#define BHGRN "\e[1;92m"     // Bold Green. ..
+#define BHYEL "\e[1;93m"    // Bold Yellow. ..
+#define BHBLU "\e[1;94m"      // Bold Blue. ..
+#define BHMAG "\e[1;95m"   // Bold Magenta. ..
+#define BHCYN "\e[1;96m"      // Bold Cyan. ..
+#define BHWHT "\e[1;97m"     // Bold White. ..
 #define RESET "\033[0m"
 
 // Defining CHECK() tool. We use this error checking method to make the
@@ -52,15 +51,28 @@ bool reset = false;
 void sighandler(int sig){
 
     if(sig==SIGUSR2){
+
+        // Sistem resetting, disabling commands.
+
         reset = true;
-        printf("\n" BOLDBLUE "  SYSTEM RESETTING" RESET "\n");      // BOLDBLUE, BOLDYELLOW, RESET
+        printf("\n" BHBLU "  SYSTEM RESETTING" RESET "\n");      // BOLDBLUE, BOLDYELLOW, RESET
         fflush(stdout);                                             // are macros to color the text
-        printf("\n" BOLDYELLOW "  COMMAND DISABLED" RESET "\n");    // on the consoles.
+        printf("\n" BHYEL "  COMMAND DISABLED" RESET "\n");    // on the consoles.
         fflush(stdout);
     }
 
-    if(sig==SIGUSR1) reset = false;
+    if(sig==SIGUSR1) {
 
+        // Sistem stop, commands rehabilitated.
+
+        if(reset==true){
+            reset = false;
+            printf("\n" BHYEL "  COMMAND REHABILITATED" RESET "\n");
+        }
+        else{
+            reset = false;
+        }
+    }
 }
 
 // Creating main() function, where all the main tasks will take place.
@@ -77,7 +89,11 @@ int main(int argc, char *argv[]){
         printf("ERRROR OPEN FILE");
     }
 
-    //time
+    // Printing PID.
+
+    fprintf(out, "PID ./command: %d\n", getpid()); fflush(out);
+
+    // Time declaring.
     
     time_t current_time;
     struct timeval tv={0,0};
@@ -94,8 +110,6 @@ int main(int argc, char *argv[]){
 
     pid_t pid_command = getpid();
     pid_t pid_wd = atoi(argv[1]);
-
-    fprintf(out, "PID ./command: %d\n\n", pid_command);
 
     // declaring the two termios structs.
 
@@ -132,22 +146,22 @@ int main(int argc, char *argv[]){
 
     // Printing on the console informations about the simulator.
 
-    printf(BOLDMAGENTA "\n" " ############################################################################" RESET "\n");
-    printf(BOLDMAGENTA " #  _____ _____ _____ _____ _____ _____ ____     _                   _      #\n");
-    printf(BOLDMAGENTA " # |     |     |     |     |  _  |   | |    |   | |_ ___ ___ ___ ___| |___  #\n");
-    printf(BOLDMAGENTA " # |   --|  |  | | | | | | |     | | | |  |  |  | '_| . |   |_ -| . | | -_| #" RESET "\n");
-    printf(BOLDMAGENTA " # |_____|_____|_|_|_|_|_|_|__|__|_|___|____/   |_,_|___|_|_|___|___|_|___| #" RESET "\n");
-    printf(BOLDMAGENTA " #                                                                          #" RESET "\n");
-    printf(BOLDMAGENTA " ############################################################################" RESET "\n\n");
+    printf("\n" BHMAG " ############################################################################" RESET "\n");
+    printf(BHMAG " #  _____ _____ _____ _____ _____ _____ ____     _                   _      #\n");
+    printf(BHMAG " # |     |     |     |     |  _  |   | |    |   | |_ ___ ___ ___ ___| |___  #\n");
+    printf(BHMAG " # |   --|  |  | | | | | | |     | | | |  |  |  | '_| . |   |_ -| . | | -_| #" RESET "\n");
+    printf(BHMAG " # |_____|_____|_|_|_|_|_|_|__|__|_|___|____/   |_,_|___|_|_|___|___|_|___| #" RESET "\n");
+    printf(BHMAG " #                                                                          #" RESET "\n");
+    printf(BHMAG " ############################################################################" RESET "\n\n");
 
-    printf(BOLDRED "  Welcome to you my friend, this is a simulator of a hoist robot!" RESET);    
-    printf("\n" BOLDRED "  Created by Matteo Carlone and Luca Predieri." RESET "\n\n");    
-    printf(BOLDYELLOW "  Here there's a list of commands:" RESET "\n");
-    printf(BOLDGREEN "  If you want to move, press right arrow!" RESET "\n");
-    printf(BOLDCYAN "  If you want to move back, press left arrow!" RESET "\n");
-    printf(BOLDBLUE "  If you want to move down, press up arrow!" RESET "\n");
-    printf(BOLDBLUE "  If you want to move up, press down arrow!" RESET "\n");
-    printf(BOLDWHITE"  To stop the movement of the two axis, you can press X or Z!" RESET "\n\n");
+    printf(BHRED "  Welcome to you my friend, this is a simulator of a hoist robot!" RESET);    
+    printf("\n" BHRED "  Created by Matteo Carlone and Luca Predieri." RESET "\n\n");    
+    printf(BHYEL "  Here there's a list of commands:" RESET "\n");
+    printf(BHGRN "  If you want to move, press right arrow!" RESET "\n");
+    printf(BHCYN "  If you want to move back, press left arrow!" RESET "\n");
+    printf(BHBLU "  If you want to move down, press up arrow!" RESET "\n");
+    printf(BHBLU "  If you want to move up, press down arrow!" RESET "\n");
+    printf(BHWHT"  To stop the movement of the two axis, you can press X or Z!" RESET "\n\n");
 
     // Passing the command PID to inspection and watchdog process.
 
@@ -174,7 +188,7 @@ int main(int argc, char *argv[]){
             case true:
 
                 if(c_1 != 0){
-                    printf("\n" BOLDRED " SYSTEM RESETTING, WAIT UNTIL IT FINISHES!" RESET "\n");
+                    printf("\n" BHRED " SYSTEM RESETTING, WAIT UNTIL IT FINISHES!" RESET "\n");
                     fflush(stdout);
                 }
 
@@ -197,7 +211,7 @@ int main(int argc, char *argv[]){
 
                     case 120:
 
-                        printf("\n" BOLDRED "  X Axis Stopped" RESET "\n");
+                        printf("\n" BHRED "  X Axis Stopped" RESET "\n");
                         fflush(stdout);
 
                         CHECK(write(fd_c_to_mx, &xstop, sizeof(int)));
@@ -214,7 +228,7 @@ int main(int argc, char *argv[]){
 
                     case 122:
 
-                        printf("\n" BOLDRED "  Z Axis Stopped" RESET "\n");
+                        printf("\n" BHRED "  Z Axis Stopped" RESET "\n");
                         fflush(stdout);
 
                         CHECK(write(fd_c_to_mz, &zstop, sizeof(int)));
@@ -240,7 +254,7 @@ int main(int argc, char *argv[]){
 
                             case 65:
 
-                            	printf("\n" BOLDGREEN "  UP Arrow" RESET "\n");
+                            	printf("\n" BHGRN "  UP Arrow" RESET "\n");
                                 fflush(stdout);
 
                                 CHECK(write(fd_c_to_mz, &up, sizeof(int)));
@@ -257,7 +271,7 @@ int main(int argc, char *argv[]){
 
                             case 66:
 
-                            	printf("\n" BOLDGREEN"  DOWN Arrow" RESET "\n");
+                            	printf("\n" BHGRN"  DOWN Arrow" RESET "\n");
                                 fflush(stdout);
 
                                 CHECK(write(fd_c_to_mz, &down, sizeof(int)));
@@ -275,7 +289,7 @@ int main(int argc, char *argv[]){
 
                             case 67:
 
-                            	printf("\n" BOLDGREEN "  RIGHT Arrow" RESET "\n");
+                            	printf("\n" BHGRN "  RIGHT Arrow" RESET "\n");
                                 fflush(stdout);
 
                                 CHECK(write(fd_c_to_mx, &right, sizeof(int)));
@@ -292,7 +306,7 @@ int main(int argc, char *argv[]){
 
                             case 68:
 
-                            	printf("\n"BOLDGREEN"  LEFT ARROW"RESET"\n");
+                            	printf("\n"BHGRN"  LEFT ARROW"RESET"\n");
                                 fflush(stdout);
 
                                 CHECK(write(fd_c_to_mx, &left, sizeof(int)));
@@ -319,7 +333,7 @@ int main(int argc, char *argv[]){
 
                     default:
 
-                        printf("\n"BOLDRED "  Command Not Allowed" RESET "\n");
+                        printf("\n"BHRED "  Command Not Allowed" RESET "\n");
                         fflush(stdout);
 
                     break;

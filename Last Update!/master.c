@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 
 // Defining CHECK() tool. We use this error checking method to make the
-// code lighter and more fancy, using errno.
+// code lighter and fancier, using errno.
 
 #define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stderr,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
 
