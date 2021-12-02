@@ -35,46 +35,20 @@ fi
 
 echo "Begin program installation on $1 ... ";
 export X=$1
-cp info.txt $1
 unzip src.zip -d $1;
 
 # Now we compile all the .c files and we put the executables inside a new 
 # folder called executables.
 
 echo "Begin sources' compilation ...";
-cd $1
-cd dcommand
-gcc -o command command.c
-mv command ..
-cd ..
-cd dinspection
-gcc -o inspection inspection.c
-mv inspection ..
-cd ..
-cd dmotor_x
-gcc -o motor_x motor_x.c
-mv motor_x ..
-cd ..
-cd dmotor_z
-gcc -o motor_z motor_z.c
-mv motor_z ..
-cd ..
-cd dmaster
-gcc -o master master.c
-mv master ..
-cd ..
-cd dwatchdog
-gcc -o watchdog watchdog.c
-mv watchdog ..
-cd ..
-mkdir executables
-mv command executables
-mv inspection executables
-mv motor_x executables
-mv motor_z executables
-mv master executables
-mv watchdog executables
-cd ..
+
+mkdir $1/executables;
+gcc $1/dmaster/master.c -o $1/executables/master;
+gcc $1/dcommand/command.c -o $1/executables/command;
+gcc $1/dmotor_x/motor_x.c -o $1/executables/motor_x;
+gcc $1/dmotor_z/motor_z.c -o $1/executables/motor_z;
+gcc $1/dinspection/inspection.c -o $1/executables/inspection;
+gcc $1/dwatchdog/watchdog.c -o $1/executables/watchdog;
 
 echo "You can run the program in $1 with ./run.sh ";
 

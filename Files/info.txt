@@ -5,7 +5,7 @@
                                                                                
 HOW TO INSTALL THE SIMULATOR.
 
-Steps to install (all the commands are on the console):
+Steps to install (all the commands must be done on terminal):
 	- Run ./install.sh <pathname> 
 	- Open <pathname>
 	- Run ./run.sh

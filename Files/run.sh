@@ -5,8 +5,8 @@
 # the logfile.
 
 cd $X
+mkdir logfile
 cd executables
 ./master
-mv debug.txt ..
 cd ..
-mv debug.txt logfile
+mv executables/debug.txt logfile
